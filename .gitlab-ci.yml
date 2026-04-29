@@ -1,0 +1,8 @@
+include:
+  - project: "sales-trigger/sdk/gitlab-ci-cd"
+    file: ".app-ci.yml"
+
+variables:
+  TEST_GROUP: "python-full"
+  LINT: "ruff"
+  PACKAGE_PUBLISH: "uv"

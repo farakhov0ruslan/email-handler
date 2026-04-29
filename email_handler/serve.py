@@ -1,22 +1,24 @@
-import os
 import signal
 
 import fire
 from notification_registry import NotificationChannel
+from prometheus_client import start_http_server
 from utils_library.Logging.log import configure_logger
 from utils_library.Logging.log import get_logger
 from utils_library.RabbitMQ.correct_consumer import ThreadedRabbitConsumer
 from utils_library.RabbitMQ.publisher import RabbitPublisher
 from utils_library.RabbitMQ.rabbitmq import RABBIT_MQ_CONFIG
 
+from email_handler.config import EMAIL_HANDLER_CONFIG
 from email_handler.consumer import create_consumer
 
 LOGGER = get_logger(__name__)
 
 
-def serve(env: str = "local") -> None:
-    os.environ["env"] = env
-    LOGGER.info(f"Starting email-handler in '{env}' mode")
+def serve() -> None:
+    LOGGER.info("Starting email-handler")
+    start_http_server(EMAIL_HANDLER_CONFIG.metrics_port)
+    LOGGER.info(f"Prometheus metrics on :{EMAIL_HANDLER_CONFIG.metrics_port}")
 
     with RabbitPublisher(RABBIT_MQ_CONFIG) as publisher:
         consumer = create_consumer(RABBIT_MQ_CONFIG, publisher)
@@ -38,4 +40,5 @@ def serve(env: str = "local") -> None:
 
 if __name__ == "__main__":  # pragma: no cover
     configure_logger("email_handler", "INFO", json_logger=True)
+    configure_logger(__name__, "INFO", json_logger=True)
     fire.Fire(serve)

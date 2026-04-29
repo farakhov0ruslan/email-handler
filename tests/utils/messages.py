@@ -7,6 +7,7 @@ from notification_registry import NotificationMetadata
 from notification_registry import NotificationPriority
 from notification_registry import NotificationType
 from notification_registry.serialization import PAYLOAD_TYPE_MAPPING
+from tests.utils.factories import EMAIL_ADDRESS
 
 _PAYLOAD_TO_TYPE: dict[type, NotificationType] = {
     payload_cls: notification_type
@@ -26,6 +27,7 @@ def build_message(
             notification_type=notification_type,
             channel=channel,
             priority=priority,
+            recipient_address=EMAIL_ADDRESS,
         ),
         payload=payload,
     )

@@ -5,6 +5,7 @@ from notification_registry import NotificationType
 from notification_registry import serialize_message
 
 from email_handler.processor import process_email_message
+from tests.utils.factories import EMAIL_ADDRESS
 from tests.utils.messages import build_message
 from tests.utils.mocks import mock_sender
 from tests.utils.mocks import mock_sender_raising
@@ -14,36 +15,34 @@ from tests.utils.results import make_sent_result
 
 class TestProcessEmailMessage:
     def test_reset_password_happy_path(self, mocker, reset_password_payload, reset_password_message):
-        sender = mock_sender(mocker, make_sent_result(to=reset_password_payload.recipient_email))
+        sender = mock_sender(mocker, make_sent_result(to=EMAIL_ADDRESS))
 
         process_email_message(serialize_message(reset_password_message))
 
         sender.send.assert_awaited_once()
         call = sender.send.call_args
-        assert call.kwargs["to_email"] == reset_password_payload.recipient_email
+        assert call.kwargs["to_email"] == EMAIL_ADDRESS
         assert call.kwargs["subject"] == "Password Reset Request"
         assert "<html" in call.kwargs["html_body"].lower()
 
     def test_analytics_happy_path(self, mocker, analytics_payload, analytics_message):
-        sender = mock_sender(mocker, make_sent_result(to=analytics_payload.recipient_email))
+        sender = mock_sender(mocker, make_sent_result(to=EMAIL_ADDRESS))
 
         process_email_message(serialize_message(analytics_message))
 
         call = sender.send.call_args
-        assert call.kwargs["to_email"] == analytics_payload.recipient_email
+        assert call.kwargs["to_email"] == EMAIL_ADDRESS
         assert analytics_payload.report_type in call.kwargs["subject"]
 
     def test_linkedin_disconnected_happy_path(
         self, mocker, linkedin_disconnected_payload, linkedin_disconnected_message
     ):
-        sender = mock_sender(
-            mocker, make_sent_result(to=linkedin_disconnected_payload.recipient_email)
-        )
+        sender = mock_sender(mocker, make_sent_result(to=EMAIL_ADDRESS))
 
         process_email_message(serialize_message(linkedin_disconnected_message))
 
         call = sender.send.call_args
-        assert call.kwargs["to_email"] == linkedin_disconnected_payload.recipient_email
+        assert call.kwargs["to_email"] == EMAIL_ADDRESS
         assert call.kwargs["subject"] == "LinkedIn Account Disconnected"
 
     def test_raises_runtime_error_when_sender_fails(self, mocker, reset_password_message):

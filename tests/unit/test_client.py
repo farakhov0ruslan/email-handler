@@ -80,4 +80,3 @@ class TestSendEmail:
         msg = self._published_message(publisher)
         assert isinstance(msg.payload, ResetPasswordPayload)
         assert msg.payload.user_id == reset_password_payload.user_id
-        assert msg.payload.recipient_email == reset_password_payload.recipient_email

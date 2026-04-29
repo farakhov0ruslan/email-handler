@@ -5,6 +5,7 @@ from notification_registry import LocalNotificationClient
 from notification_registry import NotificationChannel
 
 from email_handler.processor import process_email_message
+from tests.utils.factories import EMAIL_ADDRESS
 from tests.utils.messages import build_email_message
 from tests.utils.mocks import mock_sender
 from tests.utils.results import make_failed_result
@@ -27,13 +28,13 @@ class TestLocalPipeline:
     )
     def test_payload_reaches_sender(self, mocker, request, payload_fixture):
         payload = request.getfixturevalue(payload_fixture)
-        sender = mock_sender(mocker, make_sent_result(to=payload.recipient_email))
+        sender = mock_sender(mocker, make_sent_result(to=EMAIL_ADDRESS))
         message = build_email_message(payload)
 
         _run_pipeline(LocalNotificationClient(handler=_in_process_handler), message)
 
         sender.send.assert_awaited_once()
-        assert sender.send.call_args.kwargs["to_email"] == payload.recipient_email
+        assert sender.send.call_args.kwargs["to_email"] == EMAIL_ADDRESS
 
     def test_message_stored_in_published(self, mocker, reset_password_payload):
         mock_sender(mocker, make_sent_result())
