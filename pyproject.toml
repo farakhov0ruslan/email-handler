@@ -1,0 +1,42 @@
+[project]
+name = "email-handler"
+version = "0.0.1"
+requires-python = ">=3.12.4,<4.0"
+dependencies = [
+    "utils-library[full]>=0.0.120",
+    "notification-registry==0.0.1rc1+local.d015444",
+    "aiosmtplib>=5.0.0",
+    "httpx>=0.27",
+    "fire",
+]
+
+[[tool.uv.index]]
+name = "core"
+url = "https://gitlab.infra.salestrigger.io/api/v4/groups/2/-/packages/pypi/simple"
+authenticate = "always"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint.isort]
+force-single-line = true
+
+[dependency-groups]
+test = [
+    "pytest>=8",
+    "pytest-mock",
+    "pytest-cov",
+    "polyfactory>=2",
+    "respx>=0.21",
+    "freezegun",
+]
+
+[tool.pytest.ini_options]
+addopts = "--cov=email_handler --cov-report=term-missing"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+omit = ["email_handler/main.py", "email_handler/serve.py"]
+
+#[tool.uv.sources]
+#notification-registry = { path = "../notification-registry" }

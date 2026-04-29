@@ -1,0 +1,27 @@
+services:
+  email-handler:
+    build:
+      context: .
+      args:
+        ARTIFACTORY_USER: "__token__"
+        ARTIFACTORY_PWD: ${GROUP_TOKEN}
+    image: ${DOCKER_IMAGE}
+    container_name: email-handler
+    ports:
+      - "9093:9093"
+    restart: always
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+    entrypoint:
+      - /bin/bash
+      - -c
+      - python app/email_handler/serve.py --env=${SCOPE}
+    env_file:
+      - path: .env
+
+networks:
+  default:
+    external: true
+    name: ${CONTAINER_NETWORK}
